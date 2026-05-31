@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Résultat de l'analyse{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Résultat de l'analyse</h2>
+        <p class="page-subtitle">
+            Diagnostic généré par le modèle VGG16 — {{ data.analyzed_at }}
+        </p>
+    </div>
+    <a href="{{ url_for('predict') }}" class="btn btn-outline-primary">
+        <i class="bi bi-plus-circle me-2"></i>
+        Nouvelle analyse
+    </a>
+</div>
+
+<div class="row g-4">
+
+    <!-- ── Image analysée ──────────────────────────────────────────────── -->
+    <div class="col-12 col-md-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-image me-2 text-primary"></i>
+                <strong>Image analysée</strong>
+            </div>
+            <div class="card-body text-center p-3">
+                <img
+                    src="{{ url_for('static', filename=data.image_path.split('static/')[-1]) }}"
+                    alt="Lésion cutanée analysée"
+                    class="result-image img-fluid rounded"
+                >
+                <div class="mt-3 text-start">
+                    <small class="text-muted">
+                        <i class="bi bi-person me-1"></i>
+                        <strong>Patient :</strong>
+                        {{ data.patient_name }}
+                    </small><br>
+                    {% if data.patient_age %}
+                    <small class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>
+                        <strong>Âge :</strong>
+                        {{ data.patient_age }} ans
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Résultat IA ─────────────────────────────────────────────────── -->
+    <div class="col-12 col-md-7">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-cpu-fill me-2 text-primary"></i>
+                <strong>Diagnostic IA — VGG16 (Transfer Learning)</strong>
+            </div>
+            <div class="card-body">
+
+                <!-- Badge résultat -->
+                <div class="text-center my-4">
+                    <div class="result-badge result-badge-{{ data.result.color_class }}">
+                        <i class="bi bi-{% if data.result.color_class == 'danger' %}exclamation-triangle-fill{% else %}check-circle-fill{% endif %} me-2 fs-4"></i>
+                        {{ data.result.label }}
+                    </div>
+                    <p class="text-muted mt-2">
+                        Niveau de risque :
+                        <span class="badge bg-{{ data.result.color_class }}">
+                            {{ data.result.risk_level }}
+                        </span>
+                    </p>
+                </div>
+
+                <!-- Barre de confiance -->
+                <div class="confidence-section mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-semibold">Indice de confiance du modèle</span>
+                        <span class="fw-bold text-{{ data.result.color_class }}">
+                            {{ data.result.confidence }}%
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 12px; border-radius: 6px;">
+                        <div
+                            class="progress-bar bg-{{ data.result.color_class }} progress-bar-striped progress-bar-animated"
+                            role="progressbar"
+                            style="width: 0%"
+                            data-target="{{ data.result.confidence }}"
+                            aria-valuenow="{{ data.result.confidence }}"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Explication du pipeline -->
+                <div class="pipeline-steps">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-diagram-3 me-2 text-primary"></i>
+                        Pipeline de prédiction
+                    </h6>
+                    <div class="pipeline-list">
+                        <div class="pipeline-step pipeline-done">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Chargement de l'image (224×224 px)</span>
+                        </div>
+                        <div class="pipeline-step pipeline-done">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Normalisation des pixels → [0, 1]</span>
+                        </div>
+                        <div class="pipeline-step pipeline-done">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Extraction de features par VGG16 (ImageNet)</span>
+                        </div>
+                        <div class="pipeline-step pipeline-done">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>Classification finale (Dense + Sigmoid)</span>
+                        </div>
+                        <div class="pipeline-step pipeline-done">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span>
+                                Décision : sortie sigmoid 
+                                {% if data.result.label_en == 'Malignant' %}
+                                    > 0.5 → <strong>Malin</strong>
+                                {% else %}
+                                    ≤ 0.5 → <strong>Bénin</strong>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Avertissement médical ────────────────────────────────────────────── -->
+<div class="alert alert-warning mt-4 d-flex align-items-start" role="alert">
+    <i class="bi bi-exclamation-triangle-fill fs-4 me-3 mt-1 flex-shrink-0"></i>
+    <div>
+        <strong>Avertissement important</strong><br>
+        Ce résultat est généré par un modèle d'apprentissage automatique à des fins 
+        <strong>éducatives uniquement</strong>. Il ne constitue en aucun cas un diagnostic médical 
+        officiel. Veuillez consulter un dermatologue qualifié pour tout examen clinique.
+    </div>
+</div>
+
+<!-- ── Boutons de navigation ────────────────────────────────────────────── -->
+<div class="d-flex gap-3 mt-3 flex-wrap">
+    <a href="{{ url_for('predict') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>
+        Nouvelle analyse
+    </a>
+    <a href="{{ url_for('patients') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-people me-2"></i>
+        Voir l'historique
+    </a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-grid me-2"></i>
+        Tableau de bord
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animation de la barre de progression
+document.addEventListener("DOMContentLoaded", () => {
+    const bar = document.querySelector(".progress-bar[data-target]");
+    if (bar) {
+        const target = parseFloat(bar.dataset.target);
+        setTimeout(() => {
+            bar.style.transition = "width 1.2s ease-in-out";
+            bar.style.width = target + "%";
+        }, 300);
+    }
+});
+</script>
+{% endblock %}
