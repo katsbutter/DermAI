@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Historique patients{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Historique des patients</h2>
+        <p class="page-subtitle">
+            {{ patients|length }} enregistrement{{ 's' if patients|length != 1 }} 
+            dans la base de données
+        </p>
+    </div>
+    <a href="{{ url_for('predict') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle-fill me-2"></i>
+        Nouvelle analyse
+    </a>
+</div>
+
+{% if patients %}
+
+<!-- Barre de filtrage et recherche -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="row g-2 align-items-center">
+            <div class="col-12 col-md-5">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control"
+                           id="tableSearch" placeholder="Rechercher un patient…">
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <select class="form-select form-select-sm" id="resultFilter">
+                    <option value="">Tous les résultats</option>
+                    <option value="Malignant">Malin uniquement</option>
+                    <option value="Benign">Bénin uniquement</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-4 text-md-end">
+                <span class="text-muted small">
+                    <span id="filteredCount">{{ patients|length }}</span>
+                    résultat(s) affiché(s)
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tableau des patients -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="patientsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Patient</th>
+                        <th>Âge</th>
+                        <th>Résultat</th>
+                        <th>Confiance</th>
+                        <th>Analysé par</th>
+                        <th>Date</th>
+                        <th>Image</th>
+                        <th class="text-end pe-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in patients %}
+                    <tr class="patient-row"
+                        data-name="{{ p.name|lower }}"
+                        data-result="{{ p.result }}">
+                        <td class="ps-4 text-muted">{{ p.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="patient-avatar">
+                                    {{ p.name[0].upper() if p.name else '?' }}
+                                </div>
+                                <span class="fw-semibold">{{ p.name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if p.age %}{{ p.age }} ans{% else %}<span class="text-muted">—</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if p.result == 'Malignant' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Malin
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                <i class="bi bi-check-circle-fill me-1"></i>Bénin
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="confidence-mini">
+                                <div class="progress" style="height:6px;width:80px;">
+                                    <div class="progress-bar bg-{% if p.result == 'Malignant' %}danger{% else %}success{% endif %}"
+                                         style="width:{{ p.confidence }}%"></div>
+                                </div>
+                                <span class="ms-2 small">{{ "%.1f"|format(p.confidence) }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-muted">
+                                <i class="bi bi-person-badge me-1"></i>
+                                {{ p.analyzed_by or '—' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="text-muted small">
+                                {{ p.created_at.strftime('%d/%m/%Y %H:%M') if p.created_at else '—' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if p.image_path %}
+                            <img
+                                src="{{ url_for('static', filename=p.image_path.split('static/')[-1]) }}"
+                                alt="lésion"
+                                class="patient-thumb"
+                                data-bs-toggle="tooltip"
+                                title="{{ p.name }}"
+                            >
+                            {% else %}
+                            <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <form method="POST"
+                                  action="{{ url_for('delete_patient', patient_id=p.id) }}"
+                                  onsubmit="return confirm('Supprimer ce patient et son image ?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        title="Supprimer cet enregistrement">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- État vide -->
+<div class="empty-state">
+    <i class="bi bi-clipboard-x-fill empty-icon"></i>
+    <h4>Aucun patient enregistré</h4>
+    <p class="text-muted">
+        Les analyses effectuées apparaîtront ici avec tous leurs détails.
+    </p>
+    <a href="{{ url_for('predict') }}" class="btn btn-primary mt-2">
+        <i class="bi bi-plus-circle me-2"></i>
+        Lancer la première analyse
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialiser les tooltips Bootstrap
+const tooltipEls = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+tooltipEls.forEach(el => new bootstrap.Tooltip(el));
+
+// Recherche et filtre en temps réel
+const searchInput    = document.getElementById("tableSearch");
+const resultFilter   = document.getElementById("resultFilter");
+const rows           = document.querySelectorAll(".patient-row");
+const filteredCount  = document.getElementById("filteredCount");
+
+function filterTable() {
+    const q      = (searchInput?.value || "").toLowerCase();
+    const result = (resultFilter?.value || "").toLowerCase();
+    let count = 0;
+    rows.forEach(row => {
+        const name    = row.dataset.name || "";
+        const res     = (row.dataset.result || "").toLowerCase();
+        const matchQ  = !q || name.includes(q);
+        const matchR  = !result || res === result;
+        row.style.display = (matchQ && matchR) ? "" : "none";
+        if (matchQ && matchR) count++;
+    });
+    if (filteredCount) filteredCount.textContent = count;
+}
+
+if (searchInput)  searchInput.addEventListener("input", filterTable);
+if (resultFilter) resultFilter.addEventListener("change", filterTable);
+</script>
+{% endblock %}
