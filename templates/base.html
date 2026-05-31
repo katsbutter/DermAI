@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DermAI{% endblock %} — Diagnostic Cutané IA</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS personnalisé -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if session.get('user_id') %}
+<!-- ── Sidebar Navigation ──────────────────────────────────────────────── -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-activity text-primary"></i>
+        <span>DermAI</span>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}"
+           class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-grid-1x2-fill"></i>
+            <span>Tableau de bord</span>
+        </a>
+        <a href="{{ url_for('predict') }}"
+           class="sidebar-link {% if request.endpoint == 'predict' %}active{% endif %}">
+            <i class="bi bi-search-heart-fill"></i>
+            <span>Nouvelle analyse</span>
+        </a>
+        <a href="{{ url_for('patients') }}"
+           class="sidebar-link {% if request.endpoint == 'patients' %}active{% endif %}">
+            <i class="bi bi-people-fill"></i>
+            <span>Historique patients</span>
+        </a>
+        <a href="{{ url_for('about') }}"
+           class="sidebar-link {% if request.endpoint == 'about' %}active{% endif %}">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>À propos du modèle</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="user-avatar">
+                {{ session.get('username', 'U')[0].upper() }}
+            </div>
+            <div class="user-info">
+                <span class="user-name">{{ session.get('username') }}</span>
+                <span class="user-role">Médecin</span>
+            </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-logout" title="Déconnexion">
+            <i class="bi bi-box-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- ── Main Content ────────────────────────────────────────────────────── -->
+<div class="main-content" id="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="topbar-right">
+            <span class="text-muted small">
+                <i class="bi bi-clock me-1"></i>
+                <span id="current-time"></span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container px-4 pt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}x-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Page Content -->
+    <div class="page-content">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+{% else %}
+<!-- Pages sans sidebar (login) -->
+<div class="auth-wrapper">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container" style="position:fixed;top:1rem;right:1rem;z-index:9999;min-width:320px">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% block auth_content %}{% endblock %}
+</div>
+{% endif %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JS personnalisé -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
