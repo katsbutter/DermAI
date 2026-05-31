@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}À propos du modèle{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">À propos du modèle IA</h2>
+        <p class="page-subtitle">
+            Architecture, entraînement et métriques du modèle VGG16 (Transfer Learning)
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <!-- ── Présentation générale ────────────────────────────────────────── -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-cpu-fill me-2 text-primary"></i>
+                <strong>Architecture du modèle</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-4 align-items-center">
+                    <div class="col-12 col-md-7">
+                        <p>
+                            Le modèle utilisé dans DermAI est basé sur 
+                            <strong>VGG16</strong> (Visual Geometry Group, Oxford),
+                            entraîné via la technique de <strong>Transfer Learning</strong>
+                            décrite dans le <em>TD7 du cours Introduction à l'IA</em>.
+                        </p>
+                        <p>
+                            Le Transfer Learning consiste à réutiliser les poids d'un modèle
+                            pré-entraîné sur <strong>ImageNet</strong> (14 millions d'images,
+                            1 000 classes) et à remplacer sa tête de classification par
+                            des couches adaptées à notre tâche binaire 
+                            (Bénin / Malin).
+                        </p>
+                        <div class="info-box">
+                            <div class="row text-center g-3">
+                                <div class="col-4">
+                                    <div class="info-box-item">
+                                        <div class="info-value">224×224</div>
+                                        <div class="info-label">Entrée (px)</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="info-box-item">
+                                        <div class="info-value">16</div>
+                                        <div class="info-label">Couches VGG16</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="info-box-item">
+                                        <div class="info-value">Sigmoid</div>
+                                        <div class="info-label">Sortie</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-5">
+                        <div class="architecture-diagram">
+                            <div class="arch-layer arch-input">
+                                <span>Entrée image 224×224×3</span>
+                            </div>
+                            <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                            <div class="arch-layer arch-vgg">
+                                <span>VGG16 — Couches gelées<br>
+                                <small class="text-muted">(pré-entraîné ImageNet)</small></span>
+                            </div>
+                            <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                            <div class="arch-layer arch-custom">
+                                <span>Flatten → Dropout(0.5)<br>
+                                Dense(256, ReLU)</span>
+                            </div>
+                            <div class="arch-arrow"><i class="bi bi-arrow-down"></i></div>
+                            <div class="arch-layer arch-output">
+                                <span>Dense(1, Sigmoid)<br>
+                                <small>Bénin | Malin</small></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Paramètres d'entraînement ────────────────────────────────────── -->
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-gear-fill me-2 text-primary"></i>
+                <strong>Paramètres d'entraînement</strong>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Optimiseur</td>
+                            <td>Adam (lr = 1e-4)</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Fonction de perte</td>
+                            <td>Binary Cross-Entropy</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Métriques</td>
+                            <td>Accuracy</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Epochs</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Batch size</td>
+                            <td>32</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Taille d'image</td>
+                            <td>224 × 224 pixels</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Normalisation</td>
+                            <td>Pixels ÷ 255 → [0, 1]</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 fw-semibold text-muted">Seuil de décision</td>
+                            <td>0.5 (sigmoid > 0.5 → Malin)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Dataset ──────────────────────────────────────────────────────── -->
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-database-fill me-2 text-primary"></i>
+                <strong>Dataset d'entraînement</strong>
+            </div>
+            <div class="card-body">
+                <p>
+                    Le modèle a été entraîné sur le dataset
+                    <strong>Skin Cancer Malignant vs Benign</strong>
+                    disponible sur Kaggle.
+                </p>
+                <table class="table table-sm mb-3">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-muted">Source</td>
+                            <td>Kaggle (fanconic)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Train</td>
+                            <td>~2 637 images</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Test</td>
+                            <td>~660 images</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Classes</td>
+                            <td>Benign (0) / Malignant (1)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Augmentation</td>
+                            <td>Rotation, zoom, flip, shear</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a href="https://www.kaggle.com/datasets/fanconic/skin-cancer-malignant-vs-benign"
+                   target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>
+                    Voir le dataset sur Kaggle
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Référence pédagogique ─────────────────────────────────────────── -->
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-book-fill me-2"></i>
+            <strong>Référence pédagogique :</strong>
+            Ce modèle a été développé dans le cadre des TD7, TD8 et TD9 du module
+            <em>Introduction à l'IA</em> — ENSTAB, Université de Carthage.
+            Enseignante : Dr. Amira Echtioui.
+            <br><small class="text-muted mt-1 d-block">
+                Concepts clés utilisés : Transfer Learning (VGG16), ImageNet,
+                Data Augmentation, Binary Classification, Sigmoid, Dropout,
+                Courbes d'apprentissage, Matrice de confusion.
+            </small>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
