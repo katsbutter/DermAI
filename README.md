@@ -315,24 +315,32 @@ CREATE TABLE patients (
 
 ## Captures d'écran
 
-> *(Remplacez les emplacements ci-dessous par vos captures réelles)*
-
 ### Page de connexion
-![Login](static/images/screenshot_login.png)
+![Login](static/images/Capture%20d'écran%202026-05-31%20155024.png)
+![Login 2](static/images/Capture%20d'écran%202026-05-31%20155433.png)
 
 ### Tableau de bord
-![Dashboard](static/images/screenshot_dashboard.png)
+![Dashboard 1](static/images/Capture%20d'écran%202026-05-31%20155518.png)
+![Dashboard 2](static/images/Capture%20d'écran%202026-05-31%20160828.png)
+![Dashboard 3](static/images/Capture%20d'écran%202026-05-31%20160908.png)
+![Dashboard 4](static/images/Capture%20d'écran%202026-05-31%20160931.png)
 
-### Analyse IA
-![Predict](static/images/screenshot_predict.png)
-
-### Résultat de la prédiction
-![Result](static/images/screenshot_result.png)
+### Nouvelle analyse
+![Predict 1](static/images/Capture%20d'écran%202026-05-31%20161030.png)
+![Predict 2](static/images/Capture%20d'écran%202026-05-31%20161047.png)
+![Predict 3](static/images/Capture%20d'écran%202026-05-31%20161121.png)
+![Predict 4](static/images/Capture%20d'écran%202026-05-31%20161147.png)
 
 ### Historique des patients
-![Patients](static/images/screenshot_patients.png)
+![Patients 1](static/images/Capture%20d'écran%202026-05-31%20161221.png)
+![Patients 2](static/images/Capture%20d'écran%202026-05-31%20161324.png)
 
----
+### À propos du modèle
+![About 1](static/images/Capture%20d'écran%202026-05-31%20161359.png)
+![About 2](static/images/Capture%20d'écran%202026-05-31%20161416.png)
+![About 3](static/images/Capture%20d'écran%202026-05-31%20161438.png)
+![About 4](static/images/Capture%20d'écran%202026-05-31%20161509.png)
+![About 5](static/images/Capture%20d'écran%202026-05-31%20161559.png)
 
 ## Concepts IA abordés
 
