@@ -1,0 +1,20 @@
+# ============================================================
+# DermAI — Dépendances Python
+# Cours : Introduction à l'IA — ENSTAB | Dr. Amira Echtioui
+# ============================================================
+# Installation : pip install -r requirements.txt
+
+# ── Framework Web ──────────────────────────────────────────
+flask>=2.3.0
+werkzeug>=2.3.0
+
+# ── Deep Learning / IA ─────────────────────────────────────
+tensorflow>=2.12.0
+numpy>=1.23.0
+pillow>=9.5.0
+
+# ── Base de données ─────────────────────────────────────────
+mysql-connector-python>=8.0.33
+
+# ── Variables d'environnement ────────────────────────────────
+python-dotenv>=1.0.0
