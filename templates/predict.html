@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvelle analyse{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Nouvelle analyse</h2>
+        <p class="page-subtitle">
+            Soumettez une image dermoscopique pour une classification IA (Bénin / Malin)
+        </p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+
+        <form method="POST" action="{{ url_for('predict') }}"
+              enctype="multipart/form-data" id="predictForm" novalidate>
+
+            <!-- ── Informations du patient ─────────────────────────────── -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-person-badge me-2 text-primary"></i>
+                    <strong>Informations du patient</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="name" class="form-label">Nom complet</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="name"
+                                name="name"
+                                placeholder="Prénom Nom du patient"
+                            >
+                        </div>
+                        <div class="col-md-4">
+                            <label for="age" class="form-label">Âge</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="age"
+                                name="age"
+                                placeholder="Ex: 45"
+                                min="1"
+                                max="120"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Zone d'upload ──────────────────────────────────────── -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-image me-2 text-primary"></i>
+                    <strong>Image dermoscopique</strong>
+                    <span class="badge bg-secondary ms-2">JPG / JPEG / PNG — max 10 Mo</span>
+                </div>
+                <div class="card-body">
+
+                    <!-- Zone drag-and-drop -->
+                    <div class="upload-zone" id="uploadZone">
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            accept=".jpg,.jpeg,.png"
+                            class="upload-input"
+                            required
+                        >
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
+                            <p class="upload-text">
+                                Glissez-déposez votre image ici<br>
+                                <span class="text-muted">ou</span>
+                            </p>
+                            <span class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-folder2-open me-1"></i>
+                                Parcourir
+                            </span>
+                        </div>
+
+                        <!-- Prévisualisation -->
+                        <div class="upload-preview d-none" id="uploadPreview">
+                            <img id="previewImg" src="#" alt="Prévisualisation">
+                            <div class="preview-info">
+                                <p class="preview-name" id="previewName"></p>
+                                <p class="preview-size" id="previewSize"></p>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        id="removeImage">
+                                    <i class="bi bi-trash me-1"></i>Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── Bouton d'analyse ──────────────────────────────────── -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                    <i class="bi bi-search-heart me-2"></i>
+                    Lancer l'analyse IA
+                </button>
+            </div>
+
+        </form>
+
+        <!-- Note pédagogique -->
+        <div class="alert alert-info mt-4" role="alert">
+            <i class="bi bi-lightbulb-fill me-2"></i>
+            <strong>Comment fonctionne l'analyse ?</strong><br>
+            L'image est redimensionnée en <strong>224×224 pixels</strong>, normalisée dans
+            <strong>[0,1]</strong>, puis soumise au modèle <strong>VGG16</strong> 
+            (Transfer Learning, pré-entraîné sur ImageNet). La sortie sigmoid 
+            donne la probabilité de malignité : si >&nbsp;0.5 → Malin, sinon → Bénin.
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Spinner de chargement ──────────────────────────────────────────── -->
+<div class="loading-overlay d-none" id="loadingOverlay">
+    <div class="loading-box">
+        <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
+        <p class="mt-3 mb-0 fw-semibold">Analyse en cours…</p>
+        <small class="text-muted">Le modèle VGG16 traite votre image</small>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const uploadZone    = document.getElementById("uploadZone");
+const fileInput     = document.getElementById("image");
+const placeholder   = document.getElementById("uploadPlaceholder");
+const preview       = document.getElementById("uploadPreview");
+const previewImg    = document.getElementById("previewImg");
+const previewName   = document.getElementById("previewName");
+const previewSize   = document.getElementById("previewSize");
+const removeBtn     = document.getElementById("removeImage");
+const form          = document.getElementById("predictForm");
+const submitBtn     = document.getElementById("submitBtn");
+const loadingOverlay= document.getElementById("loadingOverlay");
+
+// Afficher un fichier sélectionné
+function showPreview(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        previewImg.src   = e.target.result;
+        previewName.textContent = file.name;
+        previewSize.textContent = (file.size / 1024).toFixed(1) + " Ko";
+        placeholder.classList.add("d-none");
+        preview.classList.remove("d-none");
+    };
+    reader.readAsDataURL(file);
+}
+
+// Sélection via click
+fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) showPreview(fileInput.files[0]);
+});
+
+// Drag & Drop
+uploadZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadZone.classList.add("drag-over");
+});
+uploadZone.addEventListener("dragleave", () => {
+    uploadZone.classList.remove("drag-over");
+});
+uploadZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove("drag-over");
+    const file = e.dataTransfer.files[0];
+    if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        showPreview(file);
+    }
+});
+
+// Supprimer l'image
+removeBtn.addEventListener("click", () => {
+    fileInput.value = "";
+    preview.classList.add("d-none");
+    placeholder.classList.remove("d-none");
+});
+
+// Spinner au submit
+form.addEventListener("submit", (e) => {
+    if (!fileInput.files[0]) {
+        e.preventDefault();
+        return;
+    }
+    submitBtn.disabled = true;
+    loadingOverlay.classList.remove("d-none");
+});
+</script>
+{% endblock %}
