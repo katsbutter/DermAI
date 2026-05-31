@@ -181,7 +181,7 @@ Le modèle est entraîné sur le dataset **Skin Cancer Malignant vs Benign** (Ka
 ### Étape 1 — Cloner le dépôt
 
 ```bash
-git clone https://github.com/VOTRE-NOM/DermAI.git
+git clone https://github.com/katsbutter/DermAI.git
 cd DermAI
 ```
 
