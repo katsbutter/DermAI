@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🩺 DermAI
+# DermAI
 
 ### Application Web de Diagnostic de Cancer Cutané par Intelligence Artificielle
 
@@ -18,7 +18,7 @@
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 - [Présentation du projet](#-présentation-du-projet)
 - [Fonctionnalités](#-fonctionnalités)
@@ -34,7 +34,7 @@
 
 ---
 
-## 🎯 Présentation du projet
+## Présentation du projet
 
 **DermAI** est une application web médicale développée dans le cadre du **TD8 et TD9** du module *Introduction à l'IA*. Elle intègre un modèle de **Deep Learning** (VGG16 via Transfer Learning) pour classifier des images de lésions cutanées en **Bénin** ou **Malin**.
 
@@ -46,23 +46,23 @@ L'application permet à un professionnel de santé de :
 
 ---
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
 | Fonctionnalité | Description |
 |---|---|
-| 🔐 **Authentification sécurisée** | Connexion avec mot de passe hashé (PBKDF2-SHA256) |
-| 🤖 **Analyse IA** | Classification VGG16 (Transfer Learning) avec score de confiance |
-| 📊 **Tableau de bord** | Statistiques globales (total, malins, bénins) |
-| 🖼️ **Upload drag & drop** | Prévisualisation de l'image avant soumission |
-| 💾 **Persistance MySQL** | Historique complet des patients et diagnostics |
-| 🔍 **Recherche & filtres** | Filtrage temps réel dans le tableau des patients |
-| 🗑️ **Gestion des données** | Suppression sécurisée (BDD + fichier image) |
-| 📱 **Interface responsive** | Compatible desktop, tablette et mobile |
-| 📖 **Page "À propos"** | Documentation du modèle IA (architecture, dataset, métriques) |
+| **Authentification sécurisée** | Connexion avec mot de passe hashé (PBKDF2-SHA256) |
+| **Analyse IA** | Classification VGG16 (Transfer Learning) avec score de confiance |
+| **Tableau de bord** | Statistiques globales (total, malins, bénins) |
+| **Upload drag & drop** | Prévisualisation de l'image avant soumission |
+| **Persistance MySQL** | Historique complet des patients et diagnostics |
+| **Recherche & filtres** | Filtrage temps réel dans le tableau des patients |
+| **Gestion des données** | Suppression sécurisée (BDD + fichier image) |
+| **Interface responsive** | Compatible desktop, tablette et mobile |
+| **Page "À propos"** | Documentation du modèle IA (architecture, dataset, métriques) |
 
 ---
 
-## 📁 Architecture du projet
+## Architecture du projet
 
 ```
 DermAI/
@@ -103,7 +103,7 @@ DermAI/
 
 ---
 
-## 🧠 Modèle IA — VGG16 Transfer Learning
+## Modèle IA — VGG16 Transfer Learning
 
 ### Architecture
 
@@ -156,7 +156,7 @@ Le modèle est entraîné sur le dataset **Skin Cancer Malignant vs Benign** (Ka
 
 ---
 
-## 🛠️ Technologies utilisées
+## Technologies utilisées
 
 | Couche | Technologie | Rôle |
 |---|---|---|
@@ -170,7 +170,7 @@ Le modèle est entraîné sur le dataset **Skin Cancer Malignant vs Benign** (Ka
 
 ---
 
-## 🚀 Installation et lancement
+## Installation et lancement
 
 ### Prérequis
 
@@ -252,7 +252,7 @@ Ouvrez votre navigateur : **http://127.0.0.1:5000**
 
 ---
 
-## 📖 Utilisation
+## Utilisation
 
 ### Connexion
 
@@ -287,7 +287,7 @@ Ouvrez votre navigateur : **http://127.0.0.1:5000**
 
 ---
 
-## 🗄️ Structure de la base de données
+## Structure de la base de données
 
 ```sql
 -- Table users : comptes utilisateurs
@@ -313,7 +313,7 @@ CREATE TABLE patients (
 
 ---
 
-## 📸 Captures d'écran
+## Captures d'écran
 
 > *(Remplacez les emplacements ci-dessous par vos captures réelles)*
 
@@ -334,7 +334,7 @@ CREATE TABLE patients (
 
 ---
 
-## 📚 Concepts IA abordés
+## Concepts IA abordés
 
 Ce projet mobilise les notions étudiées tout au long du cours :
 
@@ -372,7 +372,7 @@ Enregistrement MySQL + affichage résultat
 
 ---
 
-## ⚠️ Avertissement
+## Avertissement
 
 > Cette application est développée **à des fins éducatives et pédagogiques** dans le cadre du module *Introduction à l'IA* de l'ENSTAB.
 >
@@ -380,7 +380,7 @@ Enregistrement MySQL + affichage résultat
 
 ---
 
-## 👩‍🏫 Encadrement académique
+## Encadrement académique
 
 **Module :** Introduction à l'Intelligence Artificielle  
 **Enseignante :** Dr. Amira Echtioui — Maître assistante à l'ENSTAB  
